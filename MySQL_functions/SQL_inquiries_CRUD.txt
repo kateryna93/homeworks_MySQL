@@ -1,0 +1,44 @@
+<?php
+
+Написать запросы на
+
+1.Создание базы данных
+CREATE DATABASE practice_db COLLATE utf8_general_ci;
+
+2.Удаление базы данных
+DROP DATABASE `practice_db`;
+
+3.
+Создание таблицы users c такими полями:
+id - целое число, первичный ключ, автоинкримент
+name - строка длинной 35 (может быть пустым)
+surname  - строка длинной 35 (может быть пустым)
+email - строка длинной 60 (не может быть пустым)
+password - строка длинной 100 (не может быть пустым)
+age - целое число (может быть пустым)
+is_active - целое число (не может быть пустым)
+is_admin - целое число (не может быть пустым)
+
+CREATE TABLE users (
+  id int NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  name varchar(35) NULL,
+  surname varchar(35) NULL,
+  email varchar(60) NOT NULL,
+  password varchar(100) NULL,
+  age int NULL,
+  is_active int NOT NULL,
+  is_admin int NOT NULL
+);
+
+4. Очистка таблицы users
+TRUNCATE TABLE users;
+
+5. Полное удаление таблицы users
+DROP TABLE users;
+
+6. Написать SQL на 4 CRUD операции в таблице users
+C - Create: INSERT INTO users (name, surname, email, password) VALUES ('Alla', 'Illina', 'All@gmail.com', '1111');;
+R - Read: SELECT * FROM users;
+U - Update: UPDATE users SET name = 'Olga' WHERE id = 7;
+D - Delete: DELETE FROM users WHERE id = 2;
+
