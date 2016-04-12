@@ -1,0 +1,202 @@
+Спроектировать базу данных учебного заведения (академия). В академии учаться студенты, все студенты разделены по группам.
+У каждой группы студентов есть занятия которое преподает один преподаватель.
+На каждом занятии студент может получить оценнку от 1 до 5.
+
+
+Создание таблиц
+
+1.
+CREATE DATABASE academy COLLATE 'utf8_general_ci';
+
+2.
+CREATE TABLE auditory (
+  auditory_id int NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  auditory_number int NOT NULL
+);
+INSERT INTO auditory (auditory_number)
+VALUES ('200'), ('201'),('202'),('203'),('204');
+
+3.
+CREATE TABLE days (
+  day_id int NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  day_name varchar(255) NOT NULL
+);
+INSERT INTO days (day_name)
+VALUES ('понедельник'), ('вторник'), ('среда'), ('четверг'), ('пятница');
+
+4.
+CREATE TABLE groups (
+  group_id int NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  group_name varchar(255) NOT NULL
+);
+INSERT INTO groups (group_name)
+VALUES ('А'), ('В'), ('C');
+
+5.
+CREATE TABLE lessons (
+  lesson_id int NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  lesson_name varchar(255) NOT NULL
+);
+INSERT INTO lessons (lesson_name)
+VALUES ('Математика'), ('Физика'), ('Химия'), ('Информатика'), ('Английский'), ('Биология'), ('Физкультура');
+
+6.
+CREATE TABLE marks (
+  mark_id int NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  mark_name int NOT NULL
+);
+INSERT INTO marks (mark_name)
+VALUES ('1'), ('2'), ('3'), ('4'), ('5');
+
+7.
+CREATE TABLE teachers (
+  teacher_id int NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  teacher_name varchar(255) NOT NULL,
+  teacher_age int NOT NULL
+);
+INSERT INTO teachers (teacher_name, teacher_age)
+VALUES ('Александр Петрович', '35'), ('Виктор Петрович', '30'), ('Сергей Викторович', '34');
+
+8.
+CREATE TABLE time_table (
+  time_id int NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  time_day varchar(255) NOT NULL
+);
+INSERT INTO time_table (time_day)
+VALUES ('9:00'), ('10:30'), ('12:00'), ('12:30');
+
+9.
+CREATE TABLE students (
+  student_id int NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  student_name varchar(255) NOT NULL,
+  student_age int NOT NULL,
+  student_group int NOT NULL DEFAULT '1'
+);
+INSERT INTO students (student_name, student_age, student_group)
+VALUES ('Комарова Татьяна', '23', '1'), ('Биленко Антон', '19', '3'), ('Диденко Ярослав', '20', '2');
+
+ALTER TABLE students
+ADD FOREIGN KEY (student_group) REFERENCES groups (group_id)
+
+10.
+CREATE TABLE teacher_subject (
+  teacher_subject_id`\ int NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  teacher_names int NOT NULL,
+  subject int NOT NULL
+);
+INSERT INTO teacher_subject (teacher_names, subject)
+VALUES ('1', '1'), ('1', '2'), ('2', '3'), ('2', '4'), ('3', '5'), ('3', '6'), ('3', '7');
+
+ALTER TABLE teacher_subject
+ADD FOREIGN KEY (subject) REFERENCES lessons (lesson_id)
+
+ALTER TABLE teacher_subject
+ADD FOREIGN KEY (teacher_names) REFERENCES teachers (teacher_id)
+
+11.
+CREATE TABLE timetable (
+  timetable_id int NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  timetable_lesson int NOT NULL,
+  timetable_day int NOT NULL,
+  timetable_time int NOT NULL,
+  timetable_group int NOT NULL,
+  timetable_auditory int NOT NULL
+);
+INSERT INTO timetable (timetable_lesson, timetable_day, timetable_time, timetable_group, timetable_auditory)
+VALUES ('5', '2', '3', '1', '1'), ('5', '2', '4', '3', '1'), ('1', '1', '2', '2', '2');
+
+ALTER TABLE timetable
+ADD FOREIGN KEY (timetable_auditory) REFERENCES auditory (auditory_id)
+ALTER TABLE timetable
+ADD FOREIGN KEY (timetable_day) REFERENCES days (day_id)
+ALTER TABLE timetable
+ADD FOREIGN KEY (timetable_lesson) REFERENCES lessons (lesson_id)
+ALTER TABLE timetable
+ADD FOREIGN KEY (timetable_group) REFERENCES groups (group_id)
+ALTER TABLE timetable
+ADD FOREIGN KEY (timetable_time) REFERENCES time_table (time_id)
+
+12.
+CREATE TABLE progress (
+  progress_id int NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  progress_student int NOT NULL,
+  progress_lesson int NOT NULL,
+  progress_mark int NULL
+);
+INSERT INTO progress (progress_student, progress_lesson, progress_mark)
+VALUES ('1', '4', '5'), ('3', '7', '3'), ('2', '3', '2');
+
+ALTER TABLE progress
+ADD FOREIGN KEY (progress_lesson) REFERENCES lessons (lesson_id)
+ALTER TABLE progress
+ADD FOREIGN KEY (progress_mark) REFERENCES marks (mark_id)
+ALTER TABLE progress
+ADD FOREIGN KEY (progress_student) REFERENCES students (student_id)
+
+
+
+
+
+Select requests
+1. Выбрать всех студентов
+SELECT
+student_name,
+student_age,
+groups.group_name
+FROM
+students
+JOIN groups ON students.student_group = groups.group_id
+
+
+2.Выбрать группу
+SELECT
+groups.group_name,
+COUNT(student_name) AS student_count
+FROM
+students
+JOIN groups ON students.student_group = groups.group_id
+WHERE group_name = 'A'
+
+3. Выбрать всех преподавателей
+SELECT
+teacher_name,
+teacher_age,
+lesson_name
+FROM
+teacher_subject
+JOIN teachers ON teacher_subject.teacher_names = teachers.teacher_id
+JOIN lessons ON teacher_subject.subject = lessons.lesson_id
+
+4. Выбрать все занятия
+SELECT
+lessons.lesson_name,
+days.day_name,
+time_table.time_day,
+groups.group_name,
+auditory.auditory_number
+FROM timetable
+JOIN lessons ON timetable.timetable_lesson = lessons.lesson_id
+JOIN days ON timetable.timetable_day = days.day_id
+JOIN time_table ON timetable.timetable_time = time_table.time_id
+JOIN groups ON timetable.timetable_group = groups.group_id
+JOIN auditory ON timetable.timetable_auditory = auditory.auditory_id
+
+5. Выбрать студентов какой-то одной группы
+SELECT
+student_name,
+groups.group_name
+FROM
+students
+JOIN groups ON students.student_group = groups.group_id
+WHERE group_name = 'A'
+
+6. Оценки студентов за одно занятие
+SELECT
+lessons.lesson_name,
+students.student_name,
+marks.mark_name
+FROM
+progress
+JOIN lessons ON progress.progress_lesson = lessons.lesson_id
+JOIN students ON progress.progress_student = students.student_id
+JOIN marks ON progress.progress_mark  = marks.mark_id
