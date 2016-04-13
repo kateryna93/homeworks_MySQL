@@ -200,3 +200,25 @@ progress
 JOIN lessons ON progress.progress_lesson = lessons.lesson_id
 JOIN students ON progress.progress_student = students.student_id
 JOIN marks ON progress.progress_mark  = marks.mark_id
+
+7. список оценок выбранного студента а также занятие за которое он получил эту оценку
+SELECT
+lessons.lesson_name,
+students.student_name,
+marks.mark_name
+FROM
+progress
+JOIN lessons ON progress.progress_lesson = lessons.lesson_id
+JOIN students ON progress.progress_student = students.student_id
+JOIN marks ON progress.progress_mark  = marks.mark_id
+WHERE students.student_id = 1
+
+8. выбрать все занятия которые преподает выбранный преподаватель.
+SELECT
+teachers.teacher_name,
+lessons.lesson_name
+FROM
+teacher_subject
+JOIN teachers ON teacher_subject.teacher_names = teachers.teacher_id
+JOIN lessons ON teacher_subject.subject = lessons.lesson_id
+WHERE teachers.teacher_id = 1
