@@ -1,0 +1,39 @@
+CREATE DATABASE `company` COLLATE 'utf8_general_ci';
+
+CREATE TABLE `staff` (
+  `id` int NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `name` varchar(255) NOT NULL,
+  `position` varchar(255) NOT NULL,
+  `parent_id` int NULL
+);
+
+INSERT INTO `staff` (`name`, `position`, `parent_id`)
+VALUES
+('Maria Ivanova', 'director', NULL),
+('Viktor Popov', 'devision Head', '1'),
+('Iryna Petrova', 'devision Head', '1'),
+('Alla Afonova', 'Head of department', '2'),
+('Denis Nazemzev', 'Head of department', '3'),
+('Yurii Kurkov', 'manager', '4'),
+('Vlad Nasemzev', 'manager', '4'),
+('Vlad Sokolov', 'manager', '5'),
+('Yulia Dovgopol', 'manager', '5'),
+('Dina Nesterova', 'operator', '6'),
+('Vlad Sverdlov', 'operator', '6'),
+('Elena Nizhin', 'operator', '7'),
+('Olga Gubar', 'operator', '7'),
+('Vira Voron', 'operator', '8'),
+('Anna Nesterova', 'operator', '9');
+
+
+
+SELECT
+s1.name AS subordinate,
+s1.position,
+s2. name AS head,
+s2.position
+FROM
+staff AS s1
+JOIN staff AS s2 ON s1.parent_id = s2.id
+JOIN staff AS s3 ON s2.parent_id = s3.id
+JOIN staff AS s4 ON s3.parent_id = s4.id
