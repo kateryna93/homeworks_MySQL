@@ -1,0 +1,64 @@
+Дан обменние валют, обменник работает с такими валютами как доллар, евро и рубли. Курс на каждую валюту постоянно
+изменяется в течении дня. Курс на каждую валюту может меняться как угодно в течении дня, может измениться 100 раз
+а может не измениться вообще за день
+
+1. Спроектировать базу курса валют
+
+CREATE DATABASE `currency_exchanger` COLLATE 'utf8_general_ci';
+
+CREATE TABLE `currency` (
+  `id` int NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `usd` int NOT NULL,
+  `eur` int NOT NULL,
+  `rub` int NOT NULL,
+  `date` date NOT NULL,
+  `time` time NOT NULL
+);
+
+INSERT INTO `currency` (`usd`, `eur`, `rub`, `date`, `time`)
+VALUES
+('25', '27', '1', '2016-04-19' '09:30:41'),
+('24', '25', '2', '2016-04-19' '19:30:41'),
+('26', '27', '1', '2016-04-20' '18:30:41');
+
+2. Выбрать список изменения курса доллара за указанную дату
+SELECT
+usd
+FROM
+currency
+WHERE
+date = '2016-04-19'
+
+3. Выбрать мкасимальный курс валют за все время
+SELECT
+usd,
+eur,
+rub,
+'date',
+'time'
+FROM
+currency
+WHERE
+usd = (
+SELECT
+MAX(usd)
+FROM
+currency
+)
+
+4. Выбрать последний актуальный курс всех трех валют. И когда этот курс поменялся.
+SELECT
+usd,
+eur,
+rub,
+'date',
+'time'
+FROM
+currency
+WHERE
+id = (
+SELECT
+MAX(id)
+FROM
+currency
+)
