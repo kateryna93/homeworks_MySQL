@@ -6,59 +6,66 @@
 
 CREATE DATABASE `currency_exchanger` COLLATE 'utf8_general_ci';
 
+2.
 CREATE TABLE `currency` (
-  `id` int NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  `usd` int NOT NULL,
-  `eur` int NOT NULL,
-  `rub` int NOT NULL,
-  `date` date NOT NULL,
-  `time` time NOT NULL
+  `currency_id` int NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `currency_name` varchar(255) NOT NULL,
 );
 
-INSERT INTO `currency` (`usd`, `eur`, `rub`, `date`, `time`)
+INSERT INTO `currency` (`currency_name`, `currency_number`)
 VALUES
-('25', '27', '1', '2016-04-19' '09:30:41'),
-('24', '25', '2', '2016-04-19' '19:30:41'),
-('26', '27', '1', '2016-04-20' '18:30:41');
+('usd', '1'),
+('eur', '2'),
+('rub', '3');
 
-2. Выбрать список изменения курса доллара за указанную дату
-SELECT
-usd
-FROM
-currency
-WHERE
-date = '2016-04-19'
 
-3. Выбрать мкасимальный курс валют за все время
+3.
+CREATE TABLE `exchanger` (
+  `exchanger_id` int NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `date` date NOT NULL,
+  `time` time NOT NULL,
+  `currency` int(11) NOT NULL DEFAULT '1',
+  `value` int NOT NULL,
+  FOREIGN KEY (`currency`) REFERENCES `currency` (`currency_id`) ON DELETE CASCADE
+);
+
+INSERT INTO `exchanger` (`date`, `time`, `currency`, `value`)
+VALUES
+('2016-04-19', '09:00:00', '1', '24'),
+('2016-04-19', '14:00:00', '1', '26'),
+('2016-04-19', '14:30:00', '2', '27'),
+('2016-04-20', '10:00:00', '3', '1'),
+('2016-04-20', '13:00:00', '1', '25');
+
+Выбрать список изменения курса доллара за указанную дату
 SELECT
-usd,
-eur,
-rub,
-'date',
-'time'
+*
 FROM
-currency
+exchanger
 WHERE
-usd = (
+date = '2016-04-19' AND currency = 1
+
+Выбрать максимальный курс валют за все время
 SELECT
-MAX(usd)
+*
 FROM
-currency
+exchanger
+WHERE
+value = (
+SELECT
+MAX(value)
+FROM
+exchanger
 )
 
-4. Выбрать последний актуальный курс всех трех валют. И когда этот курс поменялся.
+Выбрать последний актуальный курс всех трех валют. И когда этот курс поменялся.
 SELECT
-usd,
-eur,
-rub,
-'date',
-'time'
-FROM
-currency
-WHERE
-id = (
+*
+FROM (
 SELECT
-MAX(id)
-FROM
+MAX(exchanger_id) AS id
+FROM exchanger
+GROUP BY
 currency
-)
+) AS ex2
+JOIN exchanger AS ex ON ex2.id = ex.exchanger_id
